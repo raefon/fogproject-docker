@@ -1,6 +1,6 @@
 #!/bin/bash
 ######## Variables                                                                                                                                                           [  started  ]
-Services=$(echo mariadb nginx php-fpm7 in.tftpd rpcbind nginx vsftpd FOGImageReplicator FOGImageSize FOGMulticastManager  FOGPingHosts FOGScheduler FOGSnapinHash FOGSnapinReplicator)
+Services=$(echo mariadb nginx php-fpm* in.tftpd rpcbind nginx vsftpd FOGImageReplicator FOGImageSize FOGMulticastManager  FOGPingHosts FOGScheduler FOGSnapinHash FOGSnapinReplicator)
 Webdirdest=/var/www/fog
 Ipaddress="$(ifconfig | grep -A 1 'eth0' | tail -1 | cut -d ':' -f 2 | cut -d ' ' -f 1)"
 Interface="eth0"
