@@ -120,8 +120,8 @@ long_query_time         = 5
 #report_host            = master1
 #auto_increment_increment = 2
 #auto_increment_offset  = 1
-log_bin                 = /log/mysqld/mariadb-bin
-log_bin_index           = /log/mysqld/mariadb-bin.index
+#log_bin                 = /log/mysqld/mariadb-bin
+#log_bin_index           = /log/mysqld/mariadb-bin.index
 # not fab for performance, but safer
 #sync_binlog             = 1
 #binlog_do_db            = include_database_name
