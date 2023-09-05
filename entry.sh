@@ -610,9 +610,9 @@ configureFTP() {
     vsftp=$(vsftpd -version 0>&1 | awk -F'version ' '{print $2}')
     vsvermaj=$(echo $vsftp | awk -F. '{print $1}')
     vsverbug=$(echo $vsftp | awk -F. '{print $3}')
-    seccompsand=""
+    seccompsand="seccomp_sandbox=NO"
     allow_writeable_chroot=""
-    echo -e  "max_per_ip=200\nanonymous_enable=NO\nlocal_enable=YES\nwrite_enable=YES\nlocal_umask=022\ndirmessage_enable=YES\nxferlog_enable=YES\nconnect_from_port_20=YES\nxferlog_std_format=YES\nlisten=YES\npam_service_name=vsftpd\nuserlist_enable=NO\seccomp_sandbox=NO\n$seccompsand" > /etc/vsftpd/vsftpd.conf
+    echo -e  "max_per_ip=200\nanonymous_enable=NO\nlocal_enable=YES\nwrite_enable=YES\nlocal_umask=022\ndirmessage_enable=YES\nxferlog_enable=YES\nconnect_from_port_20=YES\nxferlog_std_format=YES\nlisten=YES\npam_service_name=vsftpd\nuserlist_enable=NO\n$seccompsand" > /etc/vsftpd/vsftpd.conf
     
     errorStat $?
 
