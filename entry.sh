@@ -286,10 +286,10 @@ SetupNginx()
     StopService nginx
     StopService php-fpm7
     dots "Setting up Nginx"
-    [[ ! -z $DEBUGMODE ]] && sed -i 's/display_errors = Off/display_errors = On/' /etc/php7/php.ini  >> /output/entry.log 2>&1
-    sed -i 's/post_max_size\ \=\ 8M/post_max_size\ \=\ 3000M/g' /etc/php7/php.ini  >> /output/entry.log 2>&1
-    sed -i 's/upload_max_filesize\ \=\ 2M/upload_max_filesize\ \=\ 3000M/g' /etc/php7/php.ini  >> /output/entry.log 2>&1
-    sed -i 's/.*max_input_vars\ \=.*$/max_input_vars\ \=\ 250000/g' /etc/php7/php.ini  >> /output/entry.log 2>&1
+    [[ ! -z $DEBUGMODE ]] && sed -i 's/display_errors = Off/display_errors = On/' /etc/php81/php.ini  >> /output/entry.log 2>&1
+    sed -i 's/post_max_size\ \=\ 8M/post_max_size\ \=\ 3000M/g' /etc/php81/php.ini  >> /output/entry.log 2>&1
+    sed -i 's/upload_max_filesize\ \=\ 2M/upload_max_filesize\ \=\ 3000M/g' /etc/php81/php.ini  >> /output/entry.log 2>&1
+    sed -i 's/.*max_input_vars\ \=.*$/max_input_vars\ \=\ 250000/g' /etc/php81/php.ini  >> /output/entry.log 2>&1
 
     for i in $(find /var/www/fog -type f -name "*[A-Z]*\.class\.php" -o -name "*[A-Z]*\.event\.php" -o -name "*[A-Z]*\.hook\.php" >> /output/entry.log 2>&1); do
                 mv "$i" "$(echo $i | tr A-Z a-z)"  >> /output/entry.log 2>&1
