@@ -123,7 +123,7 @@ class DashboardPage extends FOGPage
             $url = self::$httpproto.'://' . $url;
             unset($ip);
             self::$_nodeOpts[] = sprintf(
-                '<option value="%s" urlcall="%s">%s%s ()</option>',
+                '<option value="%s" class="fogversion" urlcall="%s">%s%s ()</option>',
                 $StorageNode->id,
                 sprintf(
                     '%sservice/getversion.php',
@@ -442,7 +442,7 @@ class DashboardPage extends FOGPage
             'ActivityQueued' => &$ActivityQueued,
             'ActivitySlots' => &$ActivityTotalClients
         ];
-        if ($error) {
+        if (isset($error) && $error) {
             $data['error'] = $error;
             $data['title'] = _('No Data Available');
         }
@@ -494,10 +494,10 @@ class DashboardPage extends FOGPage
                 _('Free'),
                 _('Used')
             ],
-            'free' => $data->free,
-            'used' => $data->used
+            'free' => isset($data->free) ? $data->free : 0,
+            'used' => isset($data->used) ? $data->used : 0
         ];
-        if ($data->error) {
+        if (isset($data->error) && $data->error) {
             $datatmp['error'] = $data->error;
             $datatmp['title'] = $data->title;
         }

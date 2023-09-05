@@ -1,4 +1,4 @@
-#!/sbin/openrc-run
+#!/bin/sh
 ### BEGIN INIT INFO
 # Provides: FOGImageSize
 # Required-Start: $local_fs $remote_fs $network $syslog $network $inetd $apache2 $mysql
@@ -11,11 +11,55 @@
 # Used to stop and start the FOGImageSize Service.
 ### END INIT INFO
 
-name=FOGImageSize
-command=/opt/fog/service/$name/$name
-pidfile=/var/run/fog/$name.pid
-command_background="yes"
+PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/bin:/usr/sbin
+DAEMON=/opt/fog/service/FOGImageSize/FOGImageSize
+NAME=FOGImageSize
+PIDFILE=/var/run/fog/$NAME.pid
+DESC="FOG Computer Imaging Solution"
 
-depend() {
-        need net
-}
+test -f $DAEMON || exit 1
+
+. /lib/lsb/init-functions
+
+case "$1" in
+	start)
+		log_begin_msg "Starting $DESC: $NAME"
+		mkdir -p `dirname "$PIDFILE"`
+		if [ ! -f "$PIDFILE" ]; then
+			start-stop-daemon --start --quiet --pidfile "$PIDFILE" --make-pidfile -b --exec "$DAEMON"
+			log_end_msg $?
+		else
+			log_end_msg 1;
+		fi
+		;;
+	stop)
+		log_begin_msg "Stopping $DESC: $NAME"
+		start-stop-daemon --stop --quiet --retry 5 --oknodo --pidfile "$PIDFILE" && success=1
+		rm "$PIDFILE" 2>/dev/null >/dev/null
+		killall $DAEMON 2>/dev/null >/dev/null
+		log_end_msg 0
+		;;
+	restart)
+		log_begin_msg "Restarting $DESC: $NAME"
+		start-stop-daemon --stop --quiet --retry 5 --oknodo --pidfile "$PIDFILE" && success=1
+		rm "$PIDFILE" 2>/dev/null >/dev/null
+		killall $DAEMON 2>/dev/null >/dev/null
+		mkdir -p `dirname "$PIDFILE"`
+		if [ ! -f "$PIDFILE" ]; then
+			start-stop-daemon --start --quiet --pidfile "$PIDFILE" --make-pidfile -b --exec "$DAEMON"
+			log_end_msg $?
+		else
+			log_end_msg 1;
+		fi
+		;;
+	status)
+		status_of_proc ${DAEMON} ${NAME}
+		;;
+	*)
+		echo "Usage FOGImageSize {start|stop|restart|status}" >&2
+		exit 1;
+		;;
+esac
+
+exit 0;
+

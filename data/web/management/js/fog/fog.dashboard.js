@@ -56,7 +56,7 @@ var Graph30Day,
                     radius: 2/3,
                     formatter: function(label, series) {
                         return '<div style="color: #f3f3f3">'
-                            + series.percent
+                            + Math.round(series.percent)
                             + '%</div>';
                     },
                     threshold: 0.1
@@ -147,7 +147,37 @@ var Graph30Day,
     setupDiskUsage();
     setupImagingHistory();
     setupBandwidth();
+    setupFogVersionQuery();
 })(jQuery);
+
+
+function setupFogVersionQuery() {
+    $('.fogversion').each(function() {
+        URL = $(this).attr('urlcall');
+        test = document.createElement('a');
+        test.href = URL;
+        test2 = '../'+test.pathname+test.search;
+        $.ajax({
+            context: this,
+            url: test2,
+            type: 'POST',
+            data: {
+                url: URL
+            },
+            success: function(gdata) {
+                if (typeof(gdata) == null
+                    || typeof(gdata) == 'undefined'
+                ) {
+                    var returnvalue = '-';
+                } else {
+                    var returnvalue = gdata;
+                }
+                var originaltext = $(this).text();
+                $(this).text(originaltext.replace(/\(.*\)/,'('+returnvalue+')'));
+            }
+        });
+    });
+}
 
 function setupOverlays() {
     var activity = $("#graph-activity");

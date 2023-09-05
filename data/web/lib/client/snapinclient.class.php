@@ -162,11 +162,6 @@ class SnapinClient extends FOGClient implements FOGClientSend
                             continue;
                         }
                     }
-                    $location = sprintf(
-                        'http://%s/%s',
-                        $StorageNode->get('ip'),
-                        $StorageNode->get('webroot')
-                    );
                     $path = sprintf(
                         '/%s',
                         trim($StorageNode->get('snapinpath'), '/')
@@ -189,7 +184,7 @@ class SnapinClient extends FOGClient implements FOGClientSend
                         $action = 'reboot';
                     }
                     $info['snapins'][] = array(
-                        'pack' =>( bool)$Snapin->get('packtype'),
+                        'pack' =>(bool)$Snapin->get('packtype'),
                         'hide' => (bool)$Snapin->get('hide'),
                         'timeout' => $Snapin->get('timeout'),
                         'jobtaskid' => $SnapinTask->get('id'),
@@ -201,17 +196,17 @@ class SnapinClient extends FOGClient implements FOGClientSend
                         'runwith' => $Snapin->get('runWith'),
                         'runwithargs' => $Snapin->get('runWithArgs'),
                         'hash' => strtoupper($hash),
-                        'size' => $size,
-                        'url' => rtrim($location, '/'),
+                        'size' => $Snapin->get('size'),
+                        'url' => rtrim(isset($StorageNode->location_url) ? $StorageNode->location_url : '', '/'),
                     );
                     unset($Snapin, $SnapinTask);
                 }
                 return $info;
             } elseif (isset($_REQUEST['exitcode'])) {
-                $this->_closeout($Task, $SnapinJob, $date, $HostName);
+                $this->_closeout($Task, $SnapinJob, $HostName);
             }
         } elseif (basename(self::$scriptname) === 'snapins.file.php') {
-            $this->_downloadfile($Task, $SnapinJob, $date, $HostName);
+            $this->_downloadfile($Task, $SnapinJob, $HostName);
         }
     }
     /**
@@ -318,7 +313,11 @@ class SnapinClient extends FOGClient implements FOGClientSend
                         )
                     )
                 );
-                $snapinTaskID = @max($snapinTaskID);
+                if (!is_array($snapinTaskID) || count($snapinTaskID) == 0) {
+                    $snapinTaskID = null;
+                } else {
+                    $snapinTaskID = @max($snapinTaskID);
+                }
                 $SnapinTask = new SnapinTask($snapinTaskID);
                 if (!$SnapinTask->isValid()) {
                     throw new Exception(
@@ -384,10 +383,10 @@ class SnapinClient extends FOGClient implements FOGClientSend
                 );
                 $this->send = implode("\n", $goodArray);
             } elseif (isset($_REQUEST['exitcode'])) {
-                $this->_closeout($Task, $SnapinJob, $date, $HostName);
+                $this->_closeout($Task, $SnapinJob, $HostName);
             }
         } elseif (basename(self::$scriptname) === 'snapins.file.php') {
-            $this->_downloadfile($Task, $SnapinJob, $date, $HostName);
+            $this->_downloadfile($Task, $SnapinJob, $HostName);
         }
     }
     /**
@@ -395,14 +394,13 @@ class SnapinClient extends FOGClient implements FOGClientSend
      *
      * @param object $Task      the task object
      * @param object $SnapinJob the snapin job object
-     * @param string $date      the current date
      * @param string $HostName  the hostname
      *
      * @return void
      */
-    private function _closeout($Task, $SnapinJob, $date, $HostName)
+    private function _closeout($Task, $SnapinJob, $HostName)
     {
-        $tID = $_REQUEST['taskid'];
+        $tID = isset($_REQUEST['taskid']) ? $_REQUEST['taskid'] : null;
         if (!(empty($td) && is_numeric($tID))) {
             throw new Exception(
                 sprintf(
@@ -442,8 +440,8 @@ class SnapinClient extends FOGClient implements FOGClientSend
         }
         $SnapinTask
             ->set('stateID', self::getCompleteState())
-            ->set('return', $_REQUEST['exitcode'])
-            ->set('details', $_REQUEST['exitdesc'])
+            ->set('return', isset($_REQUEST['exitcode']) ? $_REQUEST['exitcode'] : 1)
+            ->set('details', isset($_REQUEST['exitdesc']) ? $_REQUEST['exitdesc'] : '')
             ->set('complete', self::niceDate()->format('Y-m-d H:i:s'))
             ->save();
         self::$EventManager->notify(
@@ -484,14 +482,13 @@ class SnapinClient extends FOGClient implements FOGClientSend
      *
      * @param object $Task      the task object
      * @param object $SnapinJob the snapin job object
-     * @param string $date      the current date
      * @param string $HostName  the hostname
      *
      * @return void
      */
-    private function _downloadfile($Task, $SnapinJob, $date, $HostName)
+    private function _downloadfile($Task, $SnapinJob, $HostName)
     {
-        $tID = $_REQUEST['taskid'];
+        $tID = isset($_REQUEST['taskid']) ? $_REQUEST['taskid'] : null;
         if (!(!empty($tID) && is_numeric($tID))) {
             throw new Exception(
                 sprintf(
@@ -613,7 +610,7 @@ class SnapinClient extends FOGClient implements FOGClientSend
         while (ob_get_level()) {
             ob_end_clean();
         }
-        header("X-Sendfile: $SnapinFile");
+        header("X-Sendfile: $filepath");
         header('Content-Description: File Transfer');
         header('Content-Type: application/octet-stream');
         header("Content-Disposition: attachment; filename=$file");

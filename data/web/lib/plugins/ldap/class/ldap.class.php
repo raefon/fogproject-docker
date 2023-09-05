@@ -121,7 +121,7 @@ class LDAP extends FOGController
         if (!in_array($func, $nonresourcefuncs)) {
             array_unshift($args, self::$_ldapconn);
         }
-        $ret = call_user_func_array($function, $args);
+        $ret = call_user_func_array($function, array_values($args));
         return $ret;
     }
     /**
@@ -144,6 +144,7 @@ class LDAP extends FOGController
         $port = $this->get('port');
         $address = preg_replace('#^.*://#i', '', $this->get('address'));
         if (!in_array($port, $ports)) {
+            ini_set('zend.exception_ignore_args', 1);
             throw new Exception(_('Port is not valid ldap/ldaps port'));
         }
         $sock = @pfsockopen(
