@@ -107,9 +107,27 @@ SetupMySQL()
 {
     StopServices
     dots "Setup MySQL"
-    sed -i '/.*skip-networking/ s/^#*/#/' -i /etc/my.cnf.d/mariadb-server.cnf  >> /output/entry.log 2>&1
-    cp -r /var/lib/mysqlb/. /var/lib/mysql/
-    
+    sed -i "s|.*skip-networking.*|#skip-networking|g" /etc/my.cnf.d/mariadb-server.cnf  >> /output/entry.log 2>&1
+	cp -n /preinstall/custom.cnf /etc/my.cnf.d/custom.cnf
+
+	if [ -d "/run/mysqld" ]; then
+		echo "[i] mysqld already present, skipping creation"
+		chown -R mysql:mysql /var/run/mysqld
+	else
+		echo "[i] mysqld not found, creating...."
+		mkdir -p /run/mysqld
+		chown -R mysql:mysql /var/run/mysqld
+	fi
+
+	if [ -d /var/lib/mysql/mysql ]; then
+		echo "[i] MySQL directory already present, skipping creation"
+		chown -R mysql:mysql /var/lib/mysql
+	else
+		echo "[i] MySQL data directory not found, creating initial DBs"
+		chown -R mysql:mysql /var/lib/mysql
+		mysql_install_db --user=mysql --ldata=/var/lib/mysql >> /output/entry.log 2>&1
+ 	fi
+  
     echo "OK"
 
     StartService mariadb 
@@ -303,7 +321,7 @@ SetupNginx()
     chown -R nginx:nginx $Webdirdest
     errorStat $?
     StartService nginx
-    StartService php-fpm7
+    StartService php-fpm81
 }
 
 CreatingConfigFile()
