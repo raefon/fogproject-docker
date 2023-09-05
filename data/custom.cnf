@@ -126,8 +126,8 @@ long_query_time         = 5
 #sync_binlog             = 1
 #binlog_do_db            = include_database_name
 #binlog_ignore_db        = include_database_name
-expire_logs_days        = 10
-max_binlog_size         = 100M
+#expire_logs_days        = 10
+#max_binlog_size         = 100M
 # slaves
 #relay_log              = /log/mysql/relay-bin
 #relay_log_index        = /log/mysql/relay-bin.index
